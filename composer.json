@@ -1,0 +1,19 @@
+{
+    "name": "aurelio-soares/simple-router",
+    "description": "simple php router",
+    "autoload": {
+        "psr-4": {
+            "AurelioSoares\\SimpleRouter\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Aurélio Soares",
+            "email": "asc.mat@gmail.com"
+        }
+    ],
+    "require": {}
+}
