@@ -1,26 +1,23 @@
 <?php
 
 namespace AurelioSoares\SimpleRouter;
-
 class Router
 {
-    //Path to the classes that will handle the request
-    protected $path;
-    protected $routes;
-    protected function setPath(string $path): void 
-    {
-        $this->path = $path;
-    }
+    protected $routes = [];
+    protected $currentRoute = [];
 
     protected function createRoute(
         string $verb,
         string $route,
         string $class,
-        string $method,
-        string $name
+        string $method
     ): void {
         $route = rtrim($route, "/");
-        $this->routes[$name] = $route;
+        $this->routes[$verb][$route] = [
+            'route' => $route,
+            'class' => $class,
+            'method' => $method
+        ];
     }
 
     public function get(
@@ -28,7 +25,7 @@ class Router
         string $class, 
         string $method
     ): void {
-        $this->createRoute("GET", $route, $class, $method, $name = $route);
+        $this->createRoute("GET", $route, $class, $method);
     }
 
     public function post(
@@ -36,6 +33,28 @@ class Router
         string $class, 
         string $method
     ): void {
-        $this->createRoute("POST", $route, $class, $method, $name = $route);
+        $this->createRoute("POST", $route, $class, $method);
+    }
+
+    public function dispatch()
+    {
+        $method = $_SERVER['REQUEST_METHOD'];
+        $uri = $_SERVER['REQUEST_URI'];
+
+        foreach ($this->routes[$method] as $route => $routeDetails) {
+            if ($routeDetails['route'] === $uri) {
+                $this->currentRoute = $routeDetails;
+                break;
+            }
+        }
+
+        if (!empty($this->currentRoute)) {
+            $class = $this->currentRoute['class'];
+            $method = $this->currentRoute['method'];
+            return (new $class())->$method();
+        }
+
+        // Route not found
+        return null;
     }
 }
